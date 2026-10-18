@@ -281,10 +281,98 @@ function ExtraPage({route,navigate,onNoticeRead,notices}: {route:Route;navigate:
     <Panel title="Week of 05–11 October 2026"><div className="stacked-lines"><p><Pill kind="danger">Revision required</Pill></p><p><strong>Priority:</strong> AI expense categorization prototype</p><p>Finish the classification flow and attach evidence of edge-case tests.</p><p><strong>Mentor feedback:</strong> Clarify category boundaries before the next review.</p></div></Panel>
     <Panel title="Revise your weekly update"><label className="field"><span className="field-title">Progress and test evidence</span><textarea placeholder="Describe your completed work, tests and remaining blockers..." rows={6} value={weekUpdate} onChange={e=>{setWeekUpdate(e.target.value);setWeekSaved(false)}} /></label><div className="top-spaced"><Btn disabled={!weekUpdate.trim()} onClick={()=>{localStorage.setItem('pec-week-update',weekUpdate);setWeekSaved(true);}}>Save revision</Btn>{weekSaved&&<span className="inline-success"> Revision saved locally</span>}</div></Panel><Footnote/></>;
   if(route==='history')return <><Headline category="student" title="Activity history" subtitle="A chronological view of your project contributions and review status."/><Panel title="Recent activity"><div className="stacked-lines"><p>11 Oct · CON-014 · Verified · Data-cleaning notebook accepted.</p><p>10 Oct · WK-006 · Revision required · Add test output.</p><p>08 Oct · Hackathon certificate · Under review.</p></div></Panel><Footnote/></>;
-  if(route==='hackathons')return <><Headline category="student" title="Hackathons & achievements" subtitle="Track participation and supporting evidence for verified team milestones."/><Panel title="Hackathon certificate"><Pill>Under review</Pill><p className="top-spaced">Awaiting coordinator verification. Approved achievements will be displayed after review.</p></Panel><Footnote/></>;
+  if (route === "hackathons") return <CertificateManagement />;
   if(route==='magazine')return <><Headline category="community" title="FinTech Innovation Monthly" subtitle="Student stories, project highlights and approved magazine editions."/><Panel title="Magazine archive"><BookOpen size={30} color="var(--maroon)"/><p className="top-spaced">Magazine issues will appear here after editorial approval. No published issues are connected in this frontend demo.</p><Btn secondary onClick={()=>navigate('home')}>Back to public hub <ArrowRight size={14}/></Btn></Panel><Footnote/></>;
   return null;
 }
+
+function CertificateManagement() {
+  const [title, setTitle] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [certificates, setCertificates] = useState<
+    { id: number; title: string; fileName: string; status: string }[]
+  >([]);
+
+  function handleUpload(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (!title.trim() || !file) {
+      alert("Enter certificate name and select a file.");
+      return;
+    }
+
+    setCertificates((previous) => [
+      ...previous,
+      {
+        id: Date.now(),
+        title: title.trim(),
+        fileName: file.name,
+        status: "Pending Review",
+      },
+    ]);
+
+    setTitle("");
+    setFile(null);
+    e.currentTarget.reset();
+  }
+
+  return (
+    <>
+      <Headline
+        category="student"
+        title="Certificate Management"
+        subtitle="Upload certificates and track their verification status."
+      />
+
+      <Panel title="Upload Certificate">
+        <form onSubmit={handleUpload} className="contribution-form">
+          <label className="field">
+            Certificate name
+            <input
+              required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. Hackathon Certificate"
+            />
+          </label>
+
+          <label className="field">
+            Certificate file (PDF or image)
+            <input
+              required
+              type="file"
+              accept=".pdf,.png,.jpg,.jpeg"
+              onChange={(e) =>
+                setFile(e.target.files?.[0] ?? null)
+              }
+            />
+          </label>
+
+          <Btn type="submit">Upload Certificate</Btn>
+        </form>
+      </Panel>
+
+      <Panel title="My Certificates">
+        {certificates.length === 0 ? (
+          <p>No certificates uploaded yet.</p>
+        ) : (
+          <div className="stacked-lines">
+            {certificates.map((certificate) => (
+              <div key={certificate.id}>
+                <h3>{certificate.title}</h3>
+                <p>{certificate.fileName}</p>
+                <Pill>{certificate.status}</Pill>
+              </div>
+            ))}
+          </div>
+        )}
+      </Panel>
+
+      <Footnote />
+    </>
+  );
+}
+
 export default function App() {
   const [route,setRoute]=useState<Route>(readHash);
   const [role,setRole]=useState<Role>(()=>getSaved('pec-role',isStudentRoute(readHash())?'student':'applicant'));
