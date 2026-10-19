@@ -693,6 +693,23 @@ VITE_APP_NAME=FinTech Innovation Team Portal
 
 Configure CORS/credentials properly if the API and frontend use different origins. Use the institution's approved environments and secure cookie settings in staging/production.
 
+### Run the certificate-management implementation in this repository
+
+Keep database credentials in `backend/.env` (copy the variable names from `backend/.env.example` and fill in local values). Never put database credentials in a frontend `.env` file or a `VITE_*` variable.
+
+```bash
+# Terminal 1 — start the Express API from the backend directory
+cd backend
+npm install
+npm start
+
+# Terminal 2 — from the repository root
+npm install
+npm run dev
+```
+
+The Vite development server proxies `/api` requests to `http://localhost:5000`. Certificate uploads accept PDF, PNG and JPEG files up to 5 MB and are stored under `backend/uploads/`, which is not served as public static content. New records start as **Pending Review**. This repository does not yet provide authentication, reviewer authorization or a certificate approval endpoint; do not treat the demo's student role as access control or expose this API publicly without those controls.
+
 ### Suggested npm scripts (define these in `apps/web/package.json`)
 
 ```json
