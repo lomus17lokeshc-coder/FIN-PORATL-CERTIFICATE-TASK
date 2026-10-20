@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 
 type Route = 'home' | 'apply' | 'status' | 'overview' | 'profile' | 'projects' |
-  'contributions' | 'weekly' | 'hackathons' | 'certificates' | 'magazine' | 'notifications' | 'history';
+  'contributions' | 'weekly' | 'hackathons' | 'magazine' | 'notifications' | 'history';
 type Role = 'applicant' | 'student';
 type Notice = { title: string; description: string; date: string; read?: boolean };
 type Certificate = {
@@ -42,7 +42,7 @@ const initialNotices: Notice[] = [
 const studentNav: { label: string; route: Route }[] = [
   { label: 'Overview', route: 'overview' }, { label: 'My profile', route: 'profile' },
   { label: 'Projects & tasks', route: 'projects' }, { label: 'Contributions', route: 'contributions' },
-  { label: 'Weekly updates', route: 'weekly' }, { label: 'Certificates', route: 'certificates' },
+  { label: 'Weekly updates', route: 'weekly' }, { label: 'Hackathons', route: 'hackathons' },
   { label: 'Magazine', route: 'magazine' }, { label: 'Notifications', route: 'notifications' },
 ];
 const applicantNav: { label: string; route: Route }[] = [
@@ -57,10 +57,10 @@ function getSaved<T,>(key: string, fallback: T): T {
   try { const stored = localStorage.getItem(key); return stored ? JSON.parse(stored) as T : fallback; }
   catch { return fallback; }
 }
-const isStudentRoute = (route: Route) => ['overview', 'profile', 'projects', 'contributions', 'weekly', 'hackathons', 'certificates', 'notifications', 'history'].includes(route);
+const isStudentRoute = (route: Route) => ['overview', 'profile', 'projects', 'contributions', 'weekly', 'hackathons', 'notifications', 'history'].includes(route);
 function readHash(): Route {
   const candidate = window.location.hash.slice(2) as Route;
-  return (['home','apply','status','overview','profile','projects','contributions','weekly','hackathons','certificates','magazine','notifications','history'] as Route[]).includes(candidate) ? candidate : 'home';
+  return (['home','apply','status','overview','profile','projects','contributions','weekly','hackathons','magazine','notifications','history'] as Route[]).includes(candidate) ? candidate : 'home';
 }
 
 function Logo({ short = false }: {short?: boolean}) {
@@ -285,7 +285,7 @@ function ExtraPage({route,navigate,onNoticeRead,notices}: {route:Route;navigate:
     <Panel title="Week of 05–11 October 2026"><div className="stacked-lines"><p><Pill kind="danger">Revision required</Pill></p><p><strong>Priority:</strong> AI expense categorization prototype</p><p>Finish the classification flow and attach evidence of edge-case tests.</p><p><strong>Mentor feedback:</strong> Clarify category boundaries before the next review.</p></div></Panel>
     <Panel title="Revise your weekly update"><label className="field"><span className="field-title">Progress and test evidence</span><textarea placeholder="Describe your completed work, tests and remaining blockers..." rows={6} value={weekUpdate} onChange={e=>{setWeekUpdate(e.target.value);setWeekSaved(false)}} /></label><div className="top-spaced"><Btn disabled={!weekUpdate.trim()} onClick={()=>{localStorage.setItem('pec-week-update',weekUpdate);setWeekSaved(true);}}>Save revision</Btn>{weekSaved&&<span className="inline-success"> Revision saved locally</span>}</div></Panel><Footnote/></>;
   if(route==='history')return <><Headline category="student" title="Activity history" subtitle="A chronological view of your project contributions and review status."/><Panel title="Recent activity"><div className="stacked-lines"><p>11 Oct · CON-014 · Verified · Data-cleaning notebook accepted.</p><p>10 Oct · WK-006 · Revision required · Add test output.</p><p>08 Oct · Hackathon certificate · Under review.</p></div></Panel><Footnote/></>;
-  if (route === "hackathons" || route === "certificates") return <CertificateManagement />;
+  if (route === "hackathons") return <CertificateManagement />;
   if(route==='magazine')return <><Headline category="community" title="FinTech Innovation Monthly" subtitle="Student stories, project highlights and approved magazine editions."/><Panel title="Magazine archive"><BookOpen size={30} color="var(--maroon)"/><p className="top-spaced">Magazine issues will appear here after editorial approval. No published issues are connected in this frontend demo.</p><Btn secondary onClick={()=>navigate('home')}>Back to public hub <ArrowRight size={14}/></Btn></Panel><Footnote/></>;
   return null;
 }
@@ -410,7 +410,7 @@ function CertificateManagement() {
         </form>
       </Panel>
 
-      <Panel title="Certificate Records">
+      <Panel title="My Certificates">
         {loading ? (
           <p role="status">Loading certificates…</p>
         ) : error ? (
@@ -434,7 +434,7 @@ function CertificateManagement() {
         )}
       </Panel>
 
-      <p className="footnote">FINTECH INNOVATION TEAM&nbsp; • &nbsp;PRATHYUSHA ENGINEERING COLLEGE</p>
+      <Footnote />
     </>
   );
 }

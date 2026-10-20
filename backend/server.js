@@ -52,8 +52,8 @@ function createApp(database = pool, uploadDirectory = UPLOAD_DIR) {
     }
   };
 
-  app.use(cors({ origin: process.env.FRONTEND_ORIGIN || "http://localhost:5173" }));
-  app.use(express.json({ limit: "32kb" }));
+  app.use(cors());
+  app.use(express.json());
 
   app.get("/", (_req, res) => {
     res.json({ message: "Certificate Management Backend is running!" });
@@ -66,9 +66,7 @@ function createApp(database = pool, uploadDirectory = UPLOAD_DIR) {
   app.get("/api/certificates", async (_req, res) => {
     try {
       const result = await database.query(
-        `SELECT id, student_name, certificate_name, file_name, status, uploaded_at
-         FROM certificates
-         ORDER BY uploaded_at DESC`
+        "SELECT * FROM certificates ORDER BY uploaded_at DESC"
       );
       res.json(result.rows);
     } catch (error) {
